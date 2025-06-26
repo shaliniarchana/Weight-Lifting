@@ -64,7 +64,7 @@ Feel free to contribute, report bugs, or suggest features! Your feedback helps m
 ### 📬 Contact
 
 Developed with ❤️ by **Shalini Archana**  
-[LinkedIn](https://linkedin.com/in/shalini-archana-vidanaarachchi-417a08314) | [GitHub](https://github.com/shaliniarchana) | shalini@example.com
+[LinkedIn](https://linkedin.com/in/shalini-archana-vidanaarachchi-417a08314) | [GitHub](https://github.com/shaliniarchana) | sliitshalini@gmail.com
 
 ---
 
