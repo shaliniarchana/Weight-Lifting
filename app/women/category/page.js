@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 export default function CategoryPage({ params }) {
-  const category = params.category;
+  const category = params?.category || "";
 
   return (
     <div>
