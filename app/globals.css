@@ -1,0 +1,362 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+
+
+
+@font-face {
+  font-family: 'Russo One';
+  src: url('/fonts/RussoOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.font-russoone {
+  font-family: 'Russo One', sans-serif;
+}
+
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+/* Neon red glowing animated border */
+.custom-glow-border {
+  position: relative;
+  border-radius: 1rem; /* match rounded-xl */
+  padding: 2rem; /* optional if you want to override Tailwind p-8 */
+  background-clip: padding-box;
+  z-index: 10;
+}
+
+.custom-glow-border::before {
+  content: "";
+  position: absolute;
+  top: -3px; bottom: -3px; left: -3px; right: -3px;
+  border-radius: 1rem;
+  background: linear-gradient(
+    270deg,
+    transparent,
+    red,
+    transparent,
+    red,
+    transparent
+  );
+  background-size: 400% 400%;
+  animation: glow-border-move 4s linear infinite;
+  z-index: -1;
+  filter: drop-shadow(0 0 6px red);
+}
+
+@keyframes glow-border-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 400% 50%;
+  }
+}
+
+/* Glowing transparent button with animated border glow */
+
+.custom-glow-btn {
+  border-image-slice: 1;
+  border-width: 2px;
+  border-style: solid;
+  border-image-source: linear-gradient(
+    45deg,
+    rgba(255, 0, 0, 0.7),
+    rgba(0, 0, 0, 0.7),
+    rgba(255, 0, 0, 0.7)
+  );
+  background-clip: padding-box;
+  box-shadow:
+    0 0 6px rgba(255, 0, 0, 0.7),
+    inset 0 0 10px rgba(255, 0, 0, 0.3);
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.custom-glow-btn::before {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 12px; /* same as rounded-xl */
+  background: linear-gradient(
+    270deg,
+    rgba(255, 0, 0, 0.6),
+    rgba(0, 0, 0, 0.6),
+    rgba(255, 0, 0, 0.6)
+  );
+  background-size: 400% 400%;
+  animation: glow-border-pulse 3s ease-in-out infinite;
+  filter: blur(6px);
+  opacity: 0.7;
+  z-index: -1;
+}
+
+.custom-glow-btn:hover::before {
+  opacity: 1;
+  filter: blur(10px);
+}
+
+@keyframes glow-border-pulse {
+  0%, 100% {
+    background-position: 0% 50%;
+    opacity: 0.7;
+  }
+  50% {
+    background-position: 400% 50%;
+    opacity: 1;
+  }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+.font-bebas {
+  font-family: 'Bebas Neue', cursive;
+}
+
+.fire-glow-border {
+  position: relative;
+  border: 3px solid red;
+  box-shadow:
+    0 0 10px rgba(255, 0, 0, 0.8),
+    0 0 30px rgba(255, 0, 0, 0.6),
+    0 0 50px rgba(255, 0, 0, 0.4);
+}
+
+.fire-glow-border::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  z-index: -1;
+  border-radius: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 0, 0.6),
+    transparent,
+    rgba(255, 0, 0, 0.7)
+  );
+  background-size: 300% 300%;
+  animation: borderFlame 5s linear infinite;
+  filter: blur(12px);
+}
+
+@keyframes borderFlame {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* Stronger targeting for AM/PM text */
+.react-time-picker__amPm,
+.react-time-picker__amPm-button,
+.react-time-picker__amPm-button:focus,
+.react-time-picker__amPm-button:hover {
+  color: black !important;
+  background-color: white !important; /* Optional, to make sure background is white */
+}
+.custom-timepicker .react-time-picker__amPm-button {
+  color: black !important;
+  background-color: white !important;
+}
+
+/* globals.css */
+
+.fire-glow-text {
+  color: #ff4d4d;
+  text-shadow:
+    0 0 2px #ff0000,
+    0 0 4px #ff1a1a,
+    0 0 6px #ff3333;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+
+.fire-underline {
+  position: relative;
+  display: inline-block;
+  margin-top: 12px;
+}
+.fire-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(
+    270deg,
+    #ff1a1a,
+    #ff4d4d,
+    #ff1a1a
+  );
+  background-size: 400% 400%;
+  border-radius: 2px;
+  animation: fire-move 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px #ff0000);
+}
+
+@keyframes fire-move {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 400% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Buttons */
+.btn-glow {
+  position: relative;
+  padding: 18px 48px;
+  font-size: 1.25rem;
+  border-radius: 12px;
+  background-color: rgba(255, 0, 0, 0.15);
+  color: white;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 0 0 12px #ff4d4d, inset 0 0 10px #ff1a1a;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.btn-glow::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, #ff1a1a 0%, transparent 70%);
+  opacity: 0.6;
+  filter: blur(25px);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+  z-index: -1;
+}
+
+.btn-glow:hover::before {
+  transform: translateX(0);
+}
+
+.btn-glow:hover {
+  background-color: rgba(255, 0, 0, 0.3);
+  box-shadow: 0 0 25px #ff4d4d, inset 0 0 15px #ff1a1a;
+}
+
+/* Fire flicker behind heading */
+.fire-flicker {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle at center, #ff3300 30%, transparent 70%);
+  filter: drop-shadow(0 0 25px #ff3300);
+  animation: flicker 2s infinite alternate;
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: -1;
+  border-radius: 50%;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.4;
+    transform: translateX(-50%) scale(0.9);
+  }
+  100% {
+    opacity: 0.7;
+    transform: translateX(-50%) scale(1.1);
+  }
+}
+
+/* Fade and scale animation */
+.fade-scale-up {
+  animation: fadeScaleUp 0.8s ease forwards;
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+@keyframes fadeScaleUp {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.fire-bg-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("/fire-bg.jpg"); /* path relative to public folder */
+  background-size: cover;
+  background-position: center;
+  opacity: 0.2;  /* adjust as you want */
+  z-index: -2;
+}
+
