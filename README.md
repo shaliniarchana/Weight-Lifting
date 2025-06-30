@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🏋️‍♂️ Weight Lifting Tournament Scoring System
 
-## Getting Started
+**Developed by:** Shalini Archana
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 🚀 Tech Stack & Tools
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Built with cutting-edge technologies to deliver a smooth, responsive, and powerful experience:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- **Next.js** & **React** — Modern front-end framework & UI library  
+- **Node.js** — Backend runtime for server-side logic  
+- **Firebase** — Real-time database and authentication  
+- **Tailwind CSS** — Utility-first styling for sleek UI  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+### 🎯 Project Overview
 
-To learn more about Next.js, take a look at the following resources:
+This project is designed to streamline scoring for weight lifting tournaments — accurate, real-time, and user-friendly. Whether you’re an organizer, judge, or athlete, this system keeps everything running smoothly.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🌟 Features
 
-## Deploy on Vercel
+- Real-time score updates and rankings  
+- User authentication and role-based access  
+- Responsive and intuitive UI built with Tailwind CSS  
+- Secure backend powered by Node.js & Firebase  
+- Clean and modular Next.js + React architecture  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 📸 Screenshots
+
+Experience the app in action:
+
+![Dashboard](public/1.png)  
+![Create Match](public/2.png)  
+![Ready Match](public/3.png)  
+![Choose Gender](public/4.png)  
+![Select Categories](public/5.png)  
+![Event Overview](public/6.png)  
+![Real-Time-Leaderboard](public/7.png)  
+
+---
+
+### 🚀 How to Run
+
+1. Clone this repo  
+2. Run `npm install` to install dependencies  
+3. Setup Firebase credentials in your environment variables  
+4. Run `npm run dev` to start the development server  
+5. Open `http://localhost:3000` in your browser  
+
+---
+
+### 🤝 Contributions & Feedback
+
+Feel free to contribute, report bugs, or suggest features! Your feedback helps make this system even better.
+
+---
+
+### 📬 Contact
+
+Developed with ❤️ by **Shalini Archana**  
+[LinkedIn](https://linkedin.com/in/shalini-archana-vidanaarachchi-417a08314) | [GitHub](https://github.com/shaliniarchana) | sliitshalini@gmail.com
+
+---
+
+Thank you for checking out the Weight Lifting Tournament Scoring System!  
+Let’s make weightlifting competitions smarter and easier! 💪
