@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Anton } from "next/font/google";
+import Head from "next/head";  
 
 const anton = Anton({ 
   weight: "400", 
@@ -29,6 +30,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" webcrx="">
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       <body
         id="__next"
         className={`${geistSans.variable} ${geistMono.variable} ${anton.className} antialiased`}

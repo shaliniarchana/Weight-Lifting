@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Modal from "react-modal";
 import {
@@ -13,9 +13,27 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+function getMatchId() {
+  return localStorage.getItem("currentMatchId");
+}
+
+function getGenderDocId() {
+  const gender = "women"; // Since you're in the women component
+  return localStorage.getItem(`currentGenderDocId_${gender}`);
+}
+
+function getCategoryDocId(category) {
+  const matchId = getMatchId();
+  const gender = "women";
+  const catMap = JSON.parse(localStorage.getItem(`categoryDocIds_${matchId}_${gender}`) || "{}");
+  return catMap[category];
+}
+
+
 const CATEGORY = "63kg";
 
 export default function CategoryPage() {
+    const router = useRouter();
   const [players, setPlayers] = useState([]);
   const [playerName, setPlayerName] = useState("");
   const [playerTeam, setPlayerTeam] = useState("");
@@ -26,12 +44,11 @@ const [cleanJerk, setCleanJerk] = useState(["", "", ""]);
 const [leaderboardVisible, setLeaderboardVisible] = useState(false);
 const [topFour, setTopFour] = useState([]);
 const [showRanks, setShowRanks] = useState(false);
+const [snatchLockState, setSnatchLockState] = useState([false, false, false]);
+const [cleanJerkLockState, setCleanJerkLockState] = useState([false, false, false]);
 
 
-
-
-
-  useEffect(() => {
+ useEffect(() => {
     const root = document?.getElementById("__next") || document?.body;
     if (root) Modal.setAppElement(root);
     loadPlayers();
@@ -39,7 +56,17 @@ const [showRanks, setShowRanks] = useState(false);
 
   async function loadPlayers() {
     try {
-      const playersRef = collection(db, "women", CATEGORY, "players");
+      const playersRef = collection(
+  db,
+  "matches",
+  getMatchId(),
+  "women",
+  getGenderDocId(),
+  "categories",
+  getCategoryDocId(CATEGORY),
+  "players"
+);
+
       const q = query(playersRef, orderBy("createdAt", "asc"));
       const querySnapshot = await getDocs(q);
       const loadedPlayers = querySnapshot.docs.map((doc) => ({
@@ -59,17 +86,30 @@ const [showRanks, setShowRanks] = useState(false);
     }
 
     try {
-      const playersRef = collection(db, "women", CATEGORY, "players");
+      const playersRef = collection(
+  db,
+  "matches",
+  getMatchId(),
+  "women",
+  getGenderDocId(),
+  "categories",
+  getCategoryDocId(CATEGORY),
+  "players"
+);
+
       const newPlayer = {
         name: playerName.trim(),
         team: playerTeam.trim(),
-        snatch: [0, 0, 0],
-        cleanJerk: [0, 0, 0],
+       snatch: [null, null, null],     // initialize with nulls
+      cleanJerk: [null, null, null],
+      snatchLockState: [false, false, false],
+cleanJerkLockState: [false, false, false],
+
         total: 0,
           completed: false,
         createdAt: Date.now(),
       };
-      const docRef = await addDoc(playersRef, newPlayer);
+        const docRef = await addDoc(playersRef, newPlayer);
       setPlayers([...players, { ...newPlayer, id: docRef.id }]);
       setPlayerName("");
       setPlayerTeam("");
@@ -79,21 +119,33 @@ const [showRanks, setShowRanks] = useState(false);
     }
   }
 
-  function openModal(player) {
-     if (player.completed) return;
-    setActivePlayer(player);
-   setSnatch((player.snatch || [0, 0, 0]).map((x) => x > 0 ? String(x) : ""));
-setCleanJerk((player.cleanJerk || [0, 0, 0]).map((x) => x > 0 ? String(x) : ""));
+  
+function openModal(player) {
+  if (player.completed) return;
+  setActivePlayer(player);
+  setSnatch((player.snatch || [null, null, null]).map((x) => x !== null ? String(x) : ""));
+  setCleanJerk((player.cleanJerk || [null, null, null]).map((x) => x !== null ? String(x) : ""));
+  setSnatchLockState(player.snatchLockState || [false, false, false]);
+  setCleanJerkLockState(player.cleanJerkLockState || [false, false, false]);
+  setModalOpen(true);
+}
 
-    setModalOpen(true);
-  }
 
  function finishCompetition() {
-  const top = [...rankedPlayers].slice(0, 4);
-  setTopFour(top);
-  setShowRanks(true); // start showing ranks in table
+  // Only include players with 6 valid scores (non-zero)
+  const eligiblePlayers = players.filter(p => {
+    const snatchValid = Array.isArray(p.snatch) && p.snatch.length === 3 && p.snatch.every(val => Number(val) > 0);
+    const cjValid = Array.isArray(p.cleanJerk) && p.cleanJerk.length === 3 && p.cleanJerk.every(val => Number(val) > 0);
+    return snatchValid && cjValid;
+  });
 
-  // Wait for animation (e.g., 1.5s), then show leaderboard
+  const ranked = [...eligiblePlayers]
+    .sort((a, b) => b.total - a.total)
+    .map((p, idx) => ({ ...p, rank: idx + 1 }));
+
+  setTopFour(ranked.slice(0, 4));
+  setShowRanks(true);
+
   setTimeout(() => {
     setLeaderboardVisible(true);
   }, 1500);
@@ -101,37 +153,69 @@ setCleanJerk((player.cleanJerk || [0, 0, 0]).map((x) => x > 0 ? String(x) : ""))
 
 
 
+
   async function saveScores() {
-    if (!activePlayer) return;
+  if (!activePlayer) return;
 
-    const cleanedSnatch = snatch.map((val) => Number(val) || 0);
-const cleanedCleanJerk = cleanJerk.map((val) => Number(val) || 0);
-const maxSnatch = Math.max(...cleanedSnatch);
-const maxCJ = Math.max(...cleanedCleanJerk);
-const total = maxSnatch + maxCJ;
+  const cleanedSnatch = snatch.map((val) => {
+    const num = val.trim() === "" ? null : Number(val);
+    return isNaN(num) ? null : num;
+  });
+
+  const cleanedCleanJerk = cleanJerk.map((val) => {
+    const num = val.trim() === "" ? null : Number(val);
+    return isNaN(num) ? null : num;
+  });
+
+  const maxSnatch = Math.max(...cleanedSnatch.filter((n) => typeof n === "number"));
+  const maxCJ = Math.max(...cleanedCleanJerk.filter((n) => typeof n === "number"));
+  const total = (maxSnatch || 0) + (maxCJ || 0);
+
+  const completed =
+    cleanedSnatch.every((n) => n !== null) && cleanedCleanJerk.every((n) => n !== null);
+
+  try {
+await updateDoc(doc( db,
+  "matches",
+  getMatchId(),
+  "women",
+  getGenderDocId(),
+  "categories",
+  getCategoryDocId(CATEGORY),
+  "players", activePlayer.id), {
+  snatch: cleanedSnatch,
+  cleanJerk: cleanedCleanJerk,
+  total,
+  completed,
+  snatchLocked: snatchLockState,
+  cleanJerkLocked: cleanJerkLockState,
+});
 
 
-    try {
-      await updateDoc(
-  doc(db, "women", CATEGORY, "players", activePlayer.id),
-  { snatch: cleanedSnatch, cleanJerk: cleanedCleanJerk, total, completed: true }
-);
-
-setPlayers((prev) =>
-  prev.map((p) =>
-    p.id === activePlayer.id
-      ? { ...p, snatch: cleanedSnatch, cleanJerk: cleanedCleanJerk, total, completed: true }
-      : p
-  )
-);
-
-
-      setModalOpen(false);
-    } catch (err) {
-      console.error("Failed to save scores:", err);
-      alert("Failed to save scores, try again.");
+    setPlayers((prev) =>
+      prev.map((p) =>
+        p.id === activePlayer.id
+  ? {
+      ...p,
+      snatch: cleanedSnatch,
+      cleanJerk: cleanedCleanJerk,
+      total,
+      completed,
+      snatchLockState,
+      cleanJerkLockState,
     }
+  : p
+
+      )
+    );
+
+    setModalOpen(false);
+  } catch (err) {
+    console.error("Failed to save scores:", err);
+    alert("Failed to save scores, try again.");
   }
+}
+
 
   const rankedPlayers = [...players]
     .filter((p) => p.total > 0)
@@ -358,6 +442,17 @@ setPlayers((prev) =>
   animation: zoomOutPopup 0.8s ease-out forwards;
 }
 
+input.bg-green-500 {
+  background-color: #00ff5e !important; /* more vibrant green */
+  color: black !important; /* black text for better contrast */
+  opacity: 1 !important;
+}
+
+input.bg-red-300 {
+  background-color: #ff1a1a !important; /* strong red */
+  color: white !important;
+  opacity: 1 !important;
+}
 
 
 `}</style>
@@ -422,11 +517,14 @@ setPlayers((prev) =>
                 <td className="p-3">{p.name}</td>
                 <td className="p-3">{p.team}</td>
                <td className="p-3">
-  {(p.snatch || []).map(val => val || 0).join(", ")}
+  {(p.snatch || []).map((val) => (val === null ? "-" : val)).join(", ")}
 </td>
+
 <td className="p-3">
-  {(p.cleanJerk || []).map(val => val || 0).join(", ")}
+  {(p.cleanJerk || []).map((val) => (val === null ? "-" : val)).join(", ")}
 </td>
+
+
 
                 <td className="p-3">{total > 0 ? total : "-"}</td>
                <td className="p-3 font-bold text-yellow-400">
@@ -442,7 +540,7 @@ setPlayers((prev) =>
   className={`glow-button px-4 py-2 rounded ${
     p.completed ? "opacity-50 cursor-not-allowed" : ""
   }`}
-  disabled={p.completed} // ✅ disable button
+  disabled={p.completed} 
 >
   {p.completed ? "Started" : "Start"}
 </button>
@@ -468,70 +566,156 @@ setPlayers((prev) =>
   </h2>
 
   <div className="mb-6">
-    <h3 className="font-semibold mb-2">Snatch Attempts</h3>
+    <h3 className="font-semibold mb-2 flex items-center justify-between">
+  Snatch Attempts
+ <button
+  onClick={() => {
+    const updatedLocks = snatch.map((val, i) =>
+      (val !== "" && val !== null && val !== undefined) ? true : snatchLockState[i]
+    );
+    setSnatchLockState(updatedLocks);
+  }}
+  className="ml-4 text-sm px-3 py-1 border border-red-500 rounded hover:bg-red-500 hover:text-white transition"
+>
+  Lock
+</button>
+
+
+</h3>
     <div className="flex justify-center">
-     {snatch.map((val, idx) => {
-  // Convert val to number, treat "" as 0
-  const numVal = Number(val) || 0;
-  const maxVal = Math.max(...snatch.map(x => Number(x) || 0));
+  {snatch.map((val, idx) => {
+  const numVal = val === null || val === "" ? null : Number(val);
+
+  // Filter out null or empty for max calculation
+  const positiveValuesForMax = snatch
+    .filter(v => v !== null && v !== "")
+    .map(Number)
+    .filter(n => n > 0);
+
+  // For min, consider zeros as valid (don't exclude zero)
+  const valuesForMin = snatch
+    .filter(v => v !== null && v !== "")
+    .map(Number);
+
+  const maxVal = positiveValuesForMax.length > 0 ? Math.max(...positiveValuesForMax) : null;
+  const minVal = valuesForMin.length > 0 ? Math.min(...valuesForMin) : null;
+
   const isMax = numVal === maxVal && numVal > 0;
-  const isFail = numVal <= 0;
+  const isMin = numVal === minVal && numVal !== null;
+
+  const locked = snatchLockState[idx];
+
+  const baseClass = `border p-2 m-1 w-20 rounded text-center ${
+    numVal === null ? "" : isMin ? "bg-red-300" : isMax ? "bg-green-500 text-black" : "bg-white text-black"
+  }`;
+
+  if (locked && val !== "" && val !== null) {
+    return (
+      <span
+        key={idx}
+        className={`${baseClass} opacity-90 cursor-not-allowed`}
+        title="Locked"
+      >
+        {val}
+      </span>
+    );
+  }
 
   return (
     <input
       key={idx}
       type="number"
-      value={val}
+      value={val === null ? "" : val}
       min={0}
       onChange={(e) => {
         const rawValue = e.target.value;
         const value = rawValue.replace(/^0+(?!$)/, "");
         setSnatch(snatch.map((s, i) => (i === idx ? value : s)));
       }}
-      className={`border p-2 m-1 w-20 rounded text-center ${
-        isFail
-          ? "bg-red-300"
-          : isMax
-          ? "bg-green-500 text-black"
-          : "bg-white text-black"
-      }`}
+      className={baseClass}
+      disabled={locked}
     />
   );
 })}
 
-    </div>
+
+</div>
   </div>
 
   <div className="mb-6">
-    <h3 className="font-semibold mb-2">Clean & Jerk Attempts</h3>
+   <h3 className="font-semibold mb-2 flex items-center justify-between">
+  Clean & Jerk Attempts
+<button
+  onClick={() => {
+    const updatedLocks = cleanJerk.map((val, i) =>
+      (val !== "" && val !== null && val !== undefined) ? true : cleanJerkLockState[i]
+    );
+    setCleanJerkLockState(updatedLocks); 
+  }}
+  className="ml-4 text-sm px-3 py-1 border border-red-500 rounded hover:bg-red-500 hover:text-white transition"
+>
+  Lock
+</button>
+
+
+</h3>
     <div className="flex justify-center">
-      {cleanJerk.map((val, idx) => {
-  const numVal = Number(val) || 0;
-  const maxVal = Math.max(...cleanJerk.map(x => Number(x) || 0));
+  {cleanJerk.map((val, idx) => {
+  const numVal = val === null || val === "" ? null : Number(val);
+
+  const positiveValuesForMax = cleanJerk
+    .filter(v => v !== null && v !== "")
+    .map(Number)
+    .filter(n => n > 0);
+
+  const valuesForMin = cleanJerk
+    .filter(v => v !== null && v !== "")
+    .map(Number);
+
+  const maxVal = positiveValuesForMax.length > 0 ? Math.max(...positiveValuesForMax) : null;
+  const minVal = valuesForMin.length > 0 ? Math.min(...valuesForMin) : null;
+
   const isMax = numVal === maxVal && numVal > 0;
-  const isFail = numVal <= 0;
+  const isMin = numVal === minVal && numVal !== null;
+
+  const locked = cleanJerkLockState[idx];
+
+  const baseClass = `border p-2 m-1 w-20 rounded text-center ${
+    numVal === null ? "" : isMin ? "bg-red-300" : isMax ? "bg-green-500 text-black" : "bg-white text-black"
+  }`;
+
+  if (locked && val !== "" && val !== null) {
+    return (
+     <span
+  key={idx}
+  className={`${baseClass} opacity-100 font-bold cursor-not-allowed`}
+  title="Locked"
+>
+  {val}
+</span>
+
+    );
+  }
 
   return (
     <input
       key={idx}
       type="number"
-      value={val}
+      value={val === null ? "" : val}
       min={0}
       onChange={(e) => {
         const rawValue = e.target.value;
         const value = rawValue.replace(/^0+(?!$)/, "");
-        setCleanJerk(cleanJerk.map((c, i) => (i === idx ? value : c)));
+        setCleanJerk(cleanJerk.map((s, i) => (i === idx ? value : s)));
       }}
-      className={`border p-2 m-1 w-20 rounded text-center ${
-        isFail
-          ? "bg-red-300"
-          : isMax
-          ? "bg-green-500 text-black"
-          : "bg-white text-black"
-      }`}
+      className={baseClass}
+      disabled={locked}
     />
   );
 })}
+
+
+
 
     </div>
   </div>
@@ -616,10 +800,10 @@ setPlayers((prev) =>
     Finish
   </button>
   <button
-  onClick={() => window.location.href = '/women'}
+  onClick={() => router.push("/women")}
   className="cancel-button border border-red-500 px-6 py-3 rounded text-lg hover:bg-gray-400 hover:text-black transition-all"
 >
-  Back to women Categories
+  Back to Women Categories
 </button>
 
 </div>

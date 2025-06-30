@@ -70,11 +70,11 @@ body {
   animation: fade-in-up 0.6s ease-out forwards;
 }
 
-/* Neon red glowing animated border */
+
 .custom-glow-border {
   position: relative;
-  border-radius: 1rem; /* match rounded-xl */
-  padding: 2rem; /* optional if you want to override Tailwind p-8 */
+  border-radius: 1rem; 
+  padding: 2rem; 
   background-clip: padding-box;
   z-index: 10;
 }
@@ -107,7 +107,7 @@ body {
   }
 }
 
-/* Glowing transparent button with animated border glow */
+
 
 .custom-glow-btn {
   border-image-slice: 1;
@@ -202,20 +202,20 @@ body {
   100% { background-position: 300% 50%; }
 }
 
-/* Stronger targeting for AM/PM text */
+
 .react-time-picker__amPm,
 .react-time-picker__amPm-button,
 .react-time-picker__amPm-button:focus,
 .react-time-picker__amPm-button:hover {
   color: black !important;
-  background-color: white !important; /* Optional, to make sure background is white */
+  background-color: white !important; 
 }
 .custom-timepicker .react-time-picker__amPm-button {
   color: black !important;
   background-color: white !important;
 }
 
-/* globals.css */
+
 
 .fire-glow-text {
   color: #ff4d4d;
@@ -264,7 +264,7 @@ body {
   }
 }
 
-/* Buttons */
+
 .btn-glow {
   position: relative;
   padding: 18px 48px;
@@ -305,7 +305,7 @@ body {
   box-shadow: 0 0 25px #ff4d4d, inset 0 0 15px #ff1a1a;
 }
 
-/* Fire flicker behind heading */
+
 .fire-flicker {
   position: absolute;
   top: -40px;
@@ -333,7 +333,7 @@ body {
   }
 }
 
-/* Fade and scale animation */
+
 .fade-scale-up {
   animation: fadeScaleUp 0.8s ease forwards;
   opacity: 0;
@@ -353,10 +353,10 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-image: url("/fire-bg.jpg"); /* path relative to public folder */
+  background-image: url("/fire-bg.jpg");
   background-size: cover;
   background-position: center;
-  opacity: 0.2;  /* adjust as you want */
+  opacity: 0.2;  
   z-index: -2;
 }
 
